@@ -1,0 +1,569 @@
+{
+  "contractName": "RootChain",
+  "abi": [
+    {
+      "constant": true,
+      "inputs": [
+        {
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "name": "childChains",
+      "outputs": [
+        {
+          "name": "initialized",
+          "type": "bool"
+        },
+        {
+          "name": "operator",
+          "type": "address"
+        },
+        {
+          "name": "depositCount",
+          "type": "uint256"
+        },
+        {
+          "name": "currentChildBlock",
+          "type": "uint256"
+        },
+        {
+          "name": "currentDepositBlock",
+          "type": "uint256"
+        },
+        {
+          "name": "currentFeeExit",
+          "type": "uint256"
+        }
+      ],
+      "payable": false,
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "constant": true,
+      "inputs": [],
+      "name": "operator",
+      "outputs": [
+        {
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "payable": false,
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "constant": true,
+      "inputs": [],
+      "name": "CHILD_BLOCK_INTERVAL",
+      "outputs": [
+        {
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "payable": false,
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "payable": false,
+      "stateMutability": "nonpayable",
+      "type": "constructor"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": false,
+          "name": "chainIndex",
+          "type": "address"
+        },
+        {
+          "indexed": true,
+          "name": "depositor",
+          "type": "address"
+        },
+        {
+          "indexed": false,
+          "name": "amount",
+          "type": "uint256"
+        },
+        {
+          "indexed": false,
+          "name": "uid",
+          "type": "uint256"
+        }
+      ],
+      "name": "Deposit",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": false,
+          "name": "chainIndex",
+          "type": "address"
+        },
+        {
+          "indexed": true,
+          "name": "depositor",
+          "type": "address"
+        },
+        {
+          "indexed": true,
+          "name": "depositBlock",
+          "type": "uint256"
+        },
+        {
+          "indexed": false,
+          "name": "token",
+          "type": "address"
+        },
+        {
+          "indexed": false,
+          "name": "amount",
+          "type": "uint256"
+        },
+        {
+          "indexed": false,
+          "name": "cont",
+          "type": "bytes"
+        }
+      ],
+      "name": "DepositFromShelter",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "name": "exitor",
+          "type": "address"
+        },
+        {
+          "components": [
+            {
+              "name": "owners",
+              "type": "address[]"
+            },
+            {
+              "name": "value",
+              "type": "uint256[]"
+            },
+            {
+              "components": [
+                {
+                  "name": "len",
+                  "type": "uint256"
+                },
+                {
+                  "name": "memPtr",
+                  "type": "uint256"
+                }
+              ],
+              "name": "state",
+              "type": "tuple[]"
+            },
+            {
+              "name": "stateBytes",
+              "type": "bytes"
+            }
+          ],
+          "indexed": false,
+          "name": "state",
+          "type": "tuple"
+        }
+      ],
+      "name": "ExitStarted",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": false,
+          "name": "root",
+          "type": "bytes32"
+        },
+        {
+          "indexed": false,
+          "name": "timestamp",
+          "type": "uint256"
+        }
+      ],
+      "name": "BlockSubmitted",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": false,
+          "name": "token",
+          "type": "address"
+        }
+      ],
+      "name": "TokenAdded",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": false,
+          "name": "data",
+          "type": "bytes32"
+        }
+      ],
+      "name": "Log",
+      "type": "event"
+    },
+    {
+      "constant": false,
+      "inputs": [],
+      "name": "addChain",
+      "outputs": [
+        {
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "payable": false,
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "constant": false,
+      "inputs": [
+        {
+          "name": "_chain",
+          "type": "address"
+        },
+        {
+          "name": "_root",
+          "type": "bytes32"
+        }
+      ],
+      "name": "submitBlock",
+      "outputs": [],
+      "payable": false,
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "constant": false,
+      "inputs": [
+        {
+          "name": "_chain",
+          "type": "address"
+        }
+      ],
+      "name": "deposit",
+      "outputs": [],
+      "payable": true,
+      "stateMutability": "payable",
+      "type": "function"
+    },
+    {
+      "constant": false,
+      "inputs": [
+        {
+          "name": "_chain",
+          "type": "address"
+        },
+        {
+          "name": "blknum",
+          "type": "uint256"
+        },
+        {
+          "name": "uid",
+          "type": "uint256"
+        }
+      ],
+      "name": "startDepositExit",
+      "outputs": [],
+      "payable": false,
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "constant": false,
+      "inputs": [
+        {
+          "name": "_chain",
+          "type": "address"
+        },
+        {
+          "name": "_blkNum",
+          "type": "uint256"
+        },
+        {
+          "name": "_oIndex",
+          "type": "uint8"
+        },
+        {
+          "name": "_txListBytes",
+          "type": "bytes"
+        }
+      ],
+      "name": "startExit",
+      "outputs": [],
+      "payable": false,
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "constant": false,
+      "inputs": [
+        {
+          "name": "_chain",
+          "type": "address"
+        },
+        {
+          "name": "_cIndex",
+          "type": "uint256"
+        },
+        {
+          "name": "_cBlkNum",
+          "type": "uint256"
+        },
+        {
+          "name": "_eUtxoPos",
+          "type": "uint256"
+        },
+        {
+          "name": "_txBytes",
+          "type": "bytes"
+        },
+        {
+          "name": "_proof",
+          "type": "bytes"
+        },
+        {
+          "name": "_sigs",
+          "type": "bytes"
+        },
+        {
+          "name": "_confsigs",
+          "type": "bytes"
+        }
+      ],
+      "name": "challengeAfter",
+      "outputs": [],
+      "payable": false,
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "constant": false,
+      "inputs": [
+        {
+          "name": "_chain",
+          "type": "address"
+        },
+        {
+          "name": "_cIndex",
+          "type": "uint256"
+        },
+        {
+          "name": "_cBlkNum",
+          "type": "uint256"
+        },
+        {
+          "name": "_eUtxoPos",
+          "type": "uint256"
+        },
+        {
+          "name": "_txInfos",
+          "type": "bytes[]"
+        }
+      ],
+      "name": "challengeBetween",
+      "outputs": [],
+      "payable": false,
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "constant": false,
+      "inputs": [
+        {
+          "name": "_chain",
+          "type": "address"
+        },
+        {
+          "name": "_cIndex",
+          "type": "uint256"
+        },
+        {
+          "name": "_cBlkNum",
+          "type": "uint256"
+        },
+        {
+          "name": "_eUtxoPos",
+          "type": "uint256"
+        },
+        {
+          "name": "_txInfos",
+          "type": "bytes[]"
+        }
+      ],
+      "name": "challengeBefore",
+      "outputs": [],
+      "payable": false,
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "constant": false,
+      "inputs": [
+        {
+          "name": "_chain",
+          "type": "address"
+        },
+        {
+          "name": "_cIndex",
+          "type": "uint256"
+        },
+        {
+          "name": "_cBlkNum",
+          "type": "uint256"
+        },
+        {
+          "name": "_eUtxoPos",
+          "type": "uint256"
+        },
+        {
+          "name": "_txInfos",
+          "type": "bytes[]"
+        }
+      ],
+      "name": "respondChallenge",
+      "outputs": [],
+      "payable": false,
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "constant": false,
+      "inputs": [
+        {
+          "name": "_chain",
+          "type": "address"
+        },
+        {
+          "name": "_utxoPos",
+          "type": "uint256"
+        }
+      ],
+      "name": "finalizeExits",
+      "outputs": [],
+      "payable": false,
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "constant": true,
+      "inputs": [
+        {
+          "name": "_chain",
+          "type": "address"
+        },
+        {
+          "name": "_blockNumber",
+          "type": "uint256"
+        }
+      ],
+      "name": "getChildChain",
+      "outputs": [
+        {
+          "name": "",
+          "type": "bytes32"
+        },
+        {
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "payable": false,
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "constant": true,
+      "inputs": [
+        {
+          "name": "_chain",
+          "type": "address"
+        }
+      ],
+      "name": "getDepositBlock",
+      "outputs": [
+        {
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "payable": false,
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "constant": true,
+      "inputs": [
+        {
+          "name": "_chain",
+          "type": "address"
+        },
+        {
+          "name": "_utxoPos",
+          "type": "uint256"
+        }
+      ],
+      "name": "getExit",
+      "outputs": [
+        {
+          "name": "",
+          "type": "address[]"
+        },
+        {
+          "name": "",
+          "type": "uint256[]"
+        },
+        {
+          "name": "",
+          "type": "bytes"
+        }
+      ],
+      "payable": false,
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "constant": true,
+      "inputs": [
+        {
+          "name": "txBytes",
+          "type": "bytes"
+        },
+        {
+          "name": "sigs",
+          "type": "bytes"
+        }
+      ],
+      "name": "verifyTransaction",
+      "outputs": [],
+      "payable": false,
+      "stateMutability": "pure",
+      "type": "function"
+    }
+  ],
+  "schemaVersion": "2.0.1",
+  "updatedAt": "2018-11-06T00:54:06.607Z"
+}

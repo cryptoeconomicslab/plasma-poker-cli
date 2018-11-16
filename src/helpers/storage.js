@@ -1,8 +1,9 @@
 const { promisify } = require("util")
-var { readFile, writeFile, readdir } = require("fs")
+var { readFile, writeFile, readdir, mkdir } = require("fs")
 readFile = promisify(readFile)
 writeFile = promisify(writeFile)
 readdir = promisify(readdir)
+mkdir = promisify(mkdir)
 
 function isJson(text){
   return (/^[\],:{}\s]*$/.test(text.replace(/\\["\\\/bfnrtu]/g, '@').
@@ -12,12 +13,34 @@ function isJson(text){
 
 const Storage = {
   store: async function(key, item) {
-    return await writeFile(`data/${key}`, JSON.stringify(item))
+    var res = false;
+    try {
+      await writeFile(`data/${key}`, JSON.stringify(item))
+      res = true
+    } catch(e){
+      console.error(e)
+      res = false
+    }
+    return res
   },
 
   load: async function(key) {
-    let res = await readFile(`data/${key}`)
-    return isJson(res) ? JSON.parse(res) : res
+    var res = null;
+    try {
+      res = await readFile(`data/${key}`)
+      res = isJson(res) ? JSON.parse(res) : res
+    } catch(e){
+      let rootFiles = await readdir("./")
+      if(rootFiles.includes("package.json") && rootFiles.includes("data")){
+        await writeFile(`data/${key}`, "")
+      } else if(!rootFiles.includes("data")) {
+        await mkdir("data")
+      } else {
+        console.error(e)
+        console.error("load failed, not in root")
+      }
+    }
+    return res
   }
 }
 

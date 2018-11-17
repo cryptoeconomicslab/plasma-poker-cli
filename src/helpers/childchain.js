@@ -1,11 +1,14 @@
+const axios = require('axios')
+
 class ChildChainApi {
     constructor(endpoint) {
       this.id = 1;
       this.endpoint = endpoint;
     }
   
-    getBlockNumber() {
-      return this.request('eth_blockNumber');
+    async getBlockNumber() {
+      let res = await this.request('eth_blockNumber')
+      return res.result;
     }
   
     getBlockByNumber(blockNumber) {
@@ -16,23 +19,22 @@ class ChildChainApi {
       return this.request('eth_sendRawTransaction', [data]);
     }
     
-    request(methodName, args) {
+    async request(methodName, args) {
       this.id++;
-      return fetch(this.endpoint, {
+      let res = await axios({
         method: 'POST',
+        url: this.endpoint,
         headers: {
           'Content-Type': 'application/json'
         },    
-        body: JSON.stringify({
+        data: JSON.stringify({
           'jsonrpc': '2.0',
           'id': this.id,
           'method': methodName,
           'params': args
         })
       })
-        .then(response => {
-          return response.json();
-        });
+      return res.data
     }
   }
   

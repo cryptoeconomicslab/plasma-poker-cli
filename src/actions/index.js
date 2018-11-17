@@ -26,18 +26,12 @@ const OperatorAddress = process.env.OPERATOR_ADDRESS || '0x627306090abab3a6e1400
 
 module.exports.web3connect = async function() {
   const wallet = new PlasmaWallet();
-  await wallet.initWeb3().then(_=> wallet )
+  let res = await wallet.initWeb3()
+  return wallet
 }
 
-module.exports.fetchBlockNumber = function () {
-return (dispatch, getState) => {
-    childChainApi.request('eth_blockNumber').then((blockNumber) => {
-    dispatch({
-        type: FETCH_BLOCK_NUMBER,
-        payload: blockNumber.result
-    });
-    })
-};
+module.exports.fetchBlockNumber = async function () {
+  return childChainApi.getBlockNumber()
 }
 
 module.exports.deposit = function deposit() {

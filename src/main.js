@@ -1,3 +1,5 @@
+require('dotenv').config()
+
 const {
   web3connect,
   fetchBlockNumber,
@@ -9,7 +11,8 @@ const {
 
 async function main(){
   let wallet = await web3connect()
-  console.log(wallet)
+  let currentBlockHeight = await fetchBlockNumber()
+  console.log(currentBlockHeight)
 }
 
 

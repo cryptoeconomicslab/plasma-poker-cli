@@ -6,9 +6,12 @@ readdir = promisify(readdir)
 mkdir = promisify(mkdir)
 
 function isJson(text){
-  return (/^[\],:{}\s]*$/.test(text.replace(/\\["\\\/bfnrtu]/g, '@').
+  return text.length > 0 ?
+    (/^[\],:{}\s]*$/.test(text.replace(/\\["\\\/bfnrtu]/g, '@').
   replace(/"[^"\\\n\r]*"|true|false|null|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?/g, ']').
   replace(/(?:^|:|,)(?:\s*\[)+/g, '')))
+  :
+    false
 }
 
 const Storage = {
@@ -27,7 +30,7 @@ const Storage = {
   load: async function(key) {
     var res = null;
     try {
-      res = await readFile(`data/${key}`)
+      res = (await readFile(`data/${key}`)).toString()
       res = isJson(res) ? JSON.parse(res) : res
     } catch(e){
       let rootFiles = await readdir("./")
@@ -36,9 +39,9 @@ const Storage = {
       } else if(!rootFiles.includes("data")) {
         await mkdir("data")
       } else {
-        console.error(e)
         console.error("load failed, not in root")
       }
+      console.error(e)
     }
     return res
   }

@@ -27,7 +27,8 @@ const OperatorAddress = process.env.OPERATOR_ADDRESS || '0x627306090abab3a6e1400
 module.exports.web3connect = async function() {
   const wallet = new PlasmaWallet();
   let res = await wallet.initWeb3()
-  return wallet
+  res.wallet = wallet
+  return res
 }
 
 module.exports.fetchBlockNumber = async function () {

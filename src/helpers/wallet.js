@@ -45,7 +45,11 @@ class PlasmaWallet {
     this.web3 = web3Root;
     this.web3Child = web3;
     this.address = utils.toChecksumAddress(utils.bufferToHex(address));
-    return address;
+    return {
+      web3Root: web3Root,
+      web3Child: web3Root,
+      address: address
+    };
   }
 
   /**
@@ -163,6 +167,18 @@ class PlasmaWallet {
     return Object.keys(this.utxos).map(k => {
       return TransactionOutput.fromTuple(RLP.decode(Buffer.from(this.utxos[k], 'hex')));
     });
+  }
+
+
+  /*
+  * ROOT UTILS
+  * */
+  async getRootNetwork(){
+    return await this.web3.eth.net.getNetworkType()
+  }
+  async getRootBalance(){
+    let balance = await this.web3.eth.getBalance(this.address)
+    return this.web3.utils.fromWei(balance, 'ether')
   }
 }
 

@@ -23,4 +23,6 @@
   - minimist: Args parser
   - shelljs: Portable commands
 - Card appearance
+  - [A-D][0-13] is the expression of cards
+  - This is exactly same as unicode naming
   - Unicode: https://en.m.wikipedia.org/wiki/Playing_cards_in_Unicode#Playing_cards_deck

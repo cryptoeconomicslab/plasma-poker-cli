@@ -25,7 +25,11 @@
     "figlet": "^1.2.1",
     "hoek": ">=4.2.1",
     "inquirer": "^6.2.0",
+    "lodash": "^4.17.11",
+    "merge-img": "^2.1.2",
     "minimist": "^1.2.0",
+    "picture-tube": "^1.0.0",
+    "poker-odds-calculator": "https://github.com/cryptoeconomicslab/node-poker-odds-calculator",
     "prompts": "^1.2.1",
     "shelljs": "^0.8.3",
     "web3": "^1.0.0-beta.26"

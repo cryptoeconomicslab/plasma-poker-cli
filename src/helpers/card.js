@@ -55,11 +55,24 @@ mod.abstToAsm = function(abst){
 }
 
 mod.calc = function(idsA, idsB){
-  const player1Cards = CardGroup.fromString(idsA.map(i=> mod.abstToAsm(mod.idToAbst(i)) ).join(""));
-  const player2Cards = CardGroup.fromString(idsB.map(i=> mod.abstToAsm(mod.idToAbst(i)) ).join(""));
+  const player1Cards = CardGroup.fromString(idsA.map(i=> mod.abstToAsm(mod.idToAbst(i))).join(""), "Alice", Date.now());
+  const player2Cards = CardGroup.fromString(idsB.map(i=> mod.abstToAsm(mod.idToAbst(i)) ).join(""), "Bob", Date.now());
   const result = OddsCalculator.calculate([player1Cards, player2Cards], []);
-  console.log(`Player #1 - ${player1Cards} - ${result.equities[0].getEquity()}%`);
-  console.log(`Player #2 - ${player2Cards} - ${result.equities[1].getEquity()}%`);
+  let aRank = result.handranks[0]
+  let bRank = result.handranks[1]
+  var winner = ""
+  if(aRank.compareTo(bRank) == 1 && bRank.compareTo(aRank) == -1){
+    winner = "Alice"
+  } else if(aRank.compareTo(bRank) == -1 && bRank.compareTo(aRank) == 1) {
+    winner = "Bob"
+  } else if(aRank.compareTo(bRank) == 0 && bRank.compareTo(aRank) == 0) {
+    winner = "None"
+  } else {
+    throw new Error("compareTo() func is broken")
+  }
+  console.log(`Alice: ${aRank.toString()} - rank: ${aRank.getRank()}`);
+  console.log(`Bob: ${bRank.toString()} - rank: ${bRank.getRank()}`);
+  console.log(`winner: ${winner}`)
 }
 
 mod.renderHands = function(hands){

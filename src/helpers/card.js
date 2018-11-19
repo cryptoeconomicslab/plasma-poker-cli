@@ -55,8 +55,11 @@ mod.abstToAsm = function(abst){
 }
 
 mod.calc = function(idsA, idsB){
-  const player1Cards = CardGroup.fromString(idsA.map(i=> mod.abstToAsm(mod.idToAbst(i))).join(""), "Alice", Date.now());
-  const player2Cards = CardGroup.fromString(idsB.map(i=> mod.abstToAsm(mod.idToAbst(i)) ).join(""), "Bob", Date.now());
+  const blk = 10000
+  const blkHex = ((blk).toString(16)+"").padStart(32, "0")
+
+  const player1Cards = CardGroup.fromString(idsA.map(i=> mod.abstToAsm(mod.idToAbst(i))+blkHex ).join(" "));
+  const player2Cards = CardGroup.fromString(idsB.map(i=> mod.abstToAsm(mod.idToAbst(i))+blkHex ).join(" "));
   const result = OddsCalculator.calculate([player1Cards, player2Cards], []);
   let aRank = result.handranks[0]
   let bRank = result.handranks[1]

@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.mjs",
   "scripts": {
-    "start": "node src/main.js -d",
+    "start": "node packages/cli/main.js -d",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",

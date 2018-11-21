@@ -64,7 +64,35 @@ mod.calc = function(idsA, idsB){
     console.log("[Duplication]")
     console.log(who)
     console.log(`${newHands} (diff: ${src} => ${dest})`)
+
+
+    /*
+    * DEBUG
+    * */
+    var dupcheckHands = ""
+    if(r.who == 0){
+      dupcheckHands = idsB.map(i=> mod.idToAsm(i) )
+    } else {
+      dupcheckHands = idsA.map(i=> mod.idToAsm(i) )
+    }
+    if(dupcheckHands.indexOf(dest.toString()) !== -1){
+      // if shuffling person gets duplication again
+      require("fs").writeFileSync(`./data/log/duplog${Date.now()}`, `
+      [Init]
+      Alice: ${idsA.map(i=> mod.idToAsm(i) ).join(" ")}
+      Bob: ${idsB.map(i=> mod.idToAsm(i) ).join(" ")}
+      [Result]
+      Alice: ${aRank.toString()} - rank: ${aRank.getRank()}
+      Bob: ${bRank.toString()} - rank: ${bRank.getRank()}
+      winner: ${winner}
+      [Duplication]
+      ${who}
+      ${newHands} (diff: ${r.srcCard.toString()} => ${r.destCard.toString()})
+      `)
+    }
+    
   })
+
   console.log(`Alice: ${aRank.toString()} - rank: ${aRank.getRank()}`);
   console.log(`Bob: ${bRank.toString()} - rank: ${bRank.getRank()}`);
   console.log(`winner: ${winner}`)

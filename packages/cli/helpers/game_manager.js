@@ -1,10 +1,12 @@
 const chalk = require('chalk');
 const figlet = require('figlet');
 const inquirer = require('inquirer')
+const prompts = require('prompts')
 const Card = require("./../helpers/card")
 const { sleep } = require("./../helpers/animation")
 const _ = require("lodash")
 const utils = require('ethereumjs-util')
+const { Storage } = require("./../helpers/storage")
 
 const {
   fetchBlockNumber,
@@ -71,26 +73,47 @@ class GameManager {
     console.log('tr')
   }
   async renderRoomCreate(){
-    console.log('cr')
+    const { roomname } = await prompts({
+      type: 'text',
+      name: 'roomname',
+      message: 'What is the name of your room?',
+      validate: roomname => {
+        var bool = ""
+        bool = roomname.length < 4 ? "Too short" : true
+        return bool
+      }
+    });
+    Storage.store(`room-${roomname}`, "")
   }
   async renderRoomList(){
-    let opts = [
-      "Alice",
-      "Carl",
-      "Diane"
-    ]
+    let opts = await Storage.searchRooms()
+    if(opts.length === 0) throw new Error("No rooms!")
+
     let { item } = await inquirer.prompt([{
-        type: 'list',
-        name: 'item',
-        message: 'Room List',
-        choices: opts
+      type: 'list',
+      name: 'item',
+      message: 'Room List',
+      choices: opts
     }])
     return { index: opts.indexOf(item), opts: opts }
+
   }
-  async renderGame(player1, player2){
+  async renderGame(player1){
+    await Storage.deleteRoom(player1)
+    const { player2 } = await prompts({
+      type: 'text',
+      name: 'player2',
+      message: 'What is your name?',
+      validate: player2 => {
+        var bool = ""
+        bool = player2.length < 2 ? "Too short" : true
+        return bool
+      }
+    });
+
     let { handsA, handsB } = this.fetchInitialHands()
     
-    console.log(chalk.blue("You"))
+    console.log(chalk.blue(player2))
     await sleep(3)
     Card.renderHands(handsB)
 

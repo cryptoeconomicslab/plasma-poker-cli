@@ -1,9 +1,10 @@
 const { promisify } = require("util")
-var { readFile, writeFile, readdir, mkdir } = require("fs")
+var { readFile, writeFile, readdir, mkdir, unlink } = require("fs")
 readFile = promisify(readFile)
 writeFile = promisify(writeFile)
 readdir = promisify(readdir)
 mkdir = promisify(mkdir)
+unlink = promisify(unlink)
 
 function isJson(text){
   return text.length > 0 ?
@@ -44,7 +45,19 @@ const Storage = {
       console.error(e)
     }
     return res
+  },
+  searchRooms: async function(){
+    let head = "room-"
+    let files = await readdir("data")
+    let hits = files.filter(file=>{
+      return file.indexOf(head) === 0
+    })
+    return hits.map(str=> str.replace(head, "") )
+  },
+  deleteRoom: async function(key){
+    await unlink(`data/room-${key}`)
   }
+
 }
 
 

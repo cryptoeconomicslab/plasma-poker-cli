@@ -26,7 +26,7 @@ async function main(){
     break;
     case 2:
       var { index, opts } = await game.renderRoomList()
-      let lastHands = await game.renderGame(opts[index], "Bob")
+      let lastHands = await game.renderGame(opts[index])
       await game.finalize(lastHands)
       let { handsA } = await game.fetchBothHands()
       game.oddsCalculation(handsA, lastHands)

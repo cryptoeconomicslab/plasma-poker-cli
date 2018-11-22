@@ -97,26 +97,23 @@ class GameManager {
     
     // turn1
     let { newHands: newHands1, bitmap: bitmapB1 } = await this.renderDiscard(handsB, "")    
-    console.log(bitmapB1)
     Card.renderHands(newHands1)
     await sleep(2)
-    newHands1 = await this.draw(newHands1)
+    newHands1 = await this.draw(newHands1, bitmapB1)
     Card.renderHands(newHands1)
 
     // turn2
     let { newHands: newHands2, bitmap: bitmapB2 } = await this.renderDiscard(newHands1, bitmapB1)    
-    console.log(bitmapB2)
     Card.renderHands(newHands2)
     await sleep(2)
-    newHands2 = await this.draw(newHands2)
+    newHands2 = await this.draw(newHands2, bitmapB2)
     Card.renderHands(newHands2)
 
     // turn3
-    let { newHands: newHands3, bitmap: bitmapB3 } = await this.renderDiscard(newHands2, bitmapB3)
-    console.log(bitmapB3)
+    let { newHands: newHands3, bitmap: bitmapB3 } = await this.renderDiscard(newHands2, bitmapB2)
     Card.renderHands(newHands3)
     await sleep(2)
-    newHands3 = await this.draw(newHands3)
+    newHands3 = await this.draw(newHands3, bitmapB3)
     Card.renderHands(newHands3)
 
     return newHands3
@@ -189,13 +186,21 @@ class GameManager {
     return { newHands: newHands, bitmap: Card.idsToBitmap(bitmapArray) }
   }
 
-  async draw(hands){
+  async draw(hands, bitmap){
+    let usedIds = Card.bitmapToIds(bitmap)
+
     let chanceCount = 5 - hands.length
     let newCards = []
     // in actual scenario, childchain will make this
     while(chanceCount > 0){
       var newCard = Card.randomId()
-      if(hands.indexOf(newCard) === -1){
+      if(
+        hands.indexOf(newCard) === -1
+        &&
+        newCards.indexOf(newCard) === -1
+        &&
+        usedIds.indexOf(newCard) === -1
+      ){
         newCards.push(newCard)
         chanceCount--
       }

@@ -1,6 +1,8 @@
 const chalk = require('chalk');
 const figlet = require('figlet');
 const inquirer = require('inquirer')
+const CLI = require('clui')
+const Spinner = CLI.Spinner
 const Card = require("./../helpers/card")
 const _ = require("lodash")
 
@@ -88,12 +90,15 @@ class GameManager {
   async renderGame(player1, player2){
     let { handsA, handsB } = this.fetchInitialHands()
     
-    console.log(chalk.blue(`${player2}`))
+    console.log(chalk.blue("You"))
+    await sleep(3)
     Card.renderHands(handsB)
 
     
     var { newHands, bitmapB } = await this.renderDiscard(handsB)    
-    console.log(newHands, bitmapB)
+    await sleep(3)
+    Card.renderHands(newHands)
+
 
     // Card.calc(handsA, handsB)
   }
@@ -149,10 +154,30 @@ class GameManager {
 
     var bitmapB = []
     var discardedIndices = item.map(i=> parseInt(i.slice(0,1))-1 )
-    var newHands = handsB.filter((h,i)=> discardedIndices.indexOf(i) === -1 )
+    var newHands = handsB
+      .filter((h,i)=> discardedIndices.indexOf(i) === -1 )
     var bitmapB = discardedIndices.map(i=> handsB[i] )
     return { newHands: newHands, bitmapB: bitmapB }
   }
+}
+
+async function sleep(i){
+  return new Promise(async (resolve, reject) => {
+    let countdown = new Spinner(`Exiting in ${i} seconds...  `, ['⣾','⣽','⣻','⢿','⡿','⣟','⣯','⣷']);
+    countdown.start();
+    let pid = setInterval(_=>{
+      countdown.message(`Exiting in ${i} seconds...  `);
+      if (i === 0) {
+        process.stdout.write('\n');
+        countdown.stop()
+        clearInterval(pid)
+        resolve()
+      }
+      i--;
+    }
+    , 1000)
+  })
+
 }
 
 

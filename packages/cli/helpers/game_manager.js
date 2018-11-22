@@ -1,9 +1,8 @@
 const chalk = require('chalk');
 const figlet = require('figlet');
 const inquirer = require('inquirer')
-const CLI = require('clui')
-const Spinner = CLI.Spinner
 const Card = require("./../helpers/card")
+const { sleep } = require("./../helpers/animation")
 const _ = require("lodash")
 
 const {
@@ -95,9 +94,27 @@ class GameManager {
     Card.renderHands(handsB)
 
     
-    var { newHands, bitmapB } = await this.renderDiscard(handsB)    
-    await sleep(3)
-    Card.renderHands(newHands)
+    // turn1
+    let { newHands: newHands1, bitmap: bitmapB1 } = await this.renderDiscard(handsB)    
+    Card.renderHands(newHands1)
+    await sleep(2)
+    newHands1 = await this.draw(newHands1)
+    Card.renderHands(newHands1)
+
+    // turn2
+    let { newHands: newHands2, bitmap: bitmapB2 } = await this.renderDiscard(newHands1)    
+    Card.renderHands(newHands2)
+    await sleep(2)
+    newHands2 = await this.draw(newHands2)
+    Card.renderHands(newHands2)
+
+    // turn3
+    let { newHands: newHands3, bitmap: bitmapB3 } = await this.renderDiscard(newHands2)    
+    Card.renderHands(newHands3)
+    await sleep(2)
+    newHands3 = await this.draw(newHands3)
+    Card.renderHands(newHands3)
+
 
 
     // Card.calc(handsA, handsB)
@@ -107,22 +124,6 @@ class GameManager {
     let handsA = []
     let handsB = []
   
-    /* TODO: どう表現したらmockっぽい？
-      ・自分はhashを自動でcommitしている
-      ・相手がまだcommitしてないことがわかる
-      ・相手がcommitしたらすぐにrevealする
-      ・相手がrevealTxの雛形を送信してきてないことがわかる
-      ・雛形がきたらすぐにrevealする
-      ・revealがまだconfされていない状態がわかる
-      ・confされたらすぐにfetchInitialHandsが実行されて自分の手札だけが見える
-      ・自分の手札をfinalizeするか否かの選択肢が存在する
-      ・finalizeを選んだら相手のcommitを待つ
-      ・相手がcommitしたらすぐにcommit confを待つ
-      ・commit confしたらrevealの雛形を待つ
-      ・revealの雛形がきたらrevealTxしてreveal confを待つ
-      ・reveal confがきたら互いの手札と勝敗をレンダリングする
-    */
-
     while(handsA.length < 5){
       handsA.push(Card.randomId())
       handsA = _.uniq(handsA)
@@ -145,7 +146,7 @@ class GameManager {
         choices: opts,
         validate: function(answer) {
           if (answer.length < 1) {
-            return 'You must choose at least one topping.';
+            return 'You must choose at least one card.';
           }
           return true;
         }
@@ -157,28 +158,18 @@ class GameManager {
     var newHands = handsB
       .filter((h,i)=> discardedIndices.indexOf(i) === -1 )
     var bitmapB = discardedIndices.map(i=> handsB[i] )
-    return { newHands: newHands, bitmapB: bitmapB }
+    return { newHands: newHands, bitmap: bitmapB }
+  }
+
+  async draw(hands){
+    let chanceCount = 5 - hands.length
+    let newCards = []
+    while(chanceCount > 0){
+      newCards.push(Card.randomId())
+      chanceCount--
+    }
+    return hands.concat(newCards)
   }
 }
-
-async function sleep(i){
-  return new Promise(async (resolve, reject) => {
-    let countdown = new Spinner(`Exiting in ${i} seconds...  `, ['⣾','⣽','⣻','⢿','⡿','⣟','⣯','⣷']);
-    countdown.start();
-    let pid = setInterval(_=>{
-      countdown.message(`Exiting in ${i} seconds...  `);
-      if (i === 0) {
-        process.stdout.write('\n');
-        countdown.stop()
-        clearInterval(pid)
-        resolve()
-      }
-      i--;
-    }
-    , 1000)
-  })
-
-}
-
 
 module.exports.GameManager = GameManager

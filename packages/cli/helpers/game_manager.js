@@ -86,9 +86,36 @@ class GameManager {
     return { index: opts.indexOf(item), opts: opts }
   }
   async renderGame(player1,player2){
+    let { handsA, handsB } = this.fetchInitialHands()
+    
+    console.log(chalk.red(`${player1}`))
+    Card.renderHands(handsA)
+    console.log(chalk.blue(`${player2}`))
+    Card.renderHands(handsB)
+  
+    Card.calc(handsA, handsB)
+  }
+
+  fetchInitialHands(){
     let handsA = []
     let handsB = []
   
+    /* TODO: どう表現したらmockっぽい？
+      ・自分はhashを自動でcommitしている
+      ・相手がまだcommitしてないことがわかる
+      ・相手がcommitしたらすぐにrevealする
+      ・相手がrevealTxの雛形を送信してきてないことがわかる
+      ・雛形がきたらすぐにrevealする
+      ・revealがまだconfされていない状態がわかる
+      ・confされたらすぐにfetchInitialHandsが実行されて自分の手札だけが見える
+      ・自分の手札をfinalizeするか否かの選択肢が存在する
+      ・finalizeを選んだら相手のcommitを待つ
+      ・相手がcommitしたらすぐにcommit confを待つ
+      ・commit confしたらrevealの雛形を待つ
+      ・revealの雛形がきたらrevealTxしてreveal confを待つ
+      ・reveal confがきたら互いの手札と勝敗をレンダリングする
+    */
+
     while(handsA.length < 5){
       handsA.push(Card.randomId())
       handsA = _.uniq(handsA)
@@ -97,13 +124,8 @@ class GameManager {
       handsB.push(Card.randomId())
       handsB = _.uniq(handsB)
     }
-    
-    console.log(chalk.red(`${player1}`))
-    Card.renderHands(handsA)
-    console.log(chalk.blue(`${player2}`))
-    Card.renderHands(handsB)
-  
-    Card.calc(handsA, handsB)
+
+    return { handsA: handsA, handsB: handsB }
   }
 
 }

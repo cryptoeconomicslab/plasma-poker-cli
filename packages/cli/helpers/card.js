@@ -36,6 +36,26 @@ mod.idToAsm = function(id){
   var n = nums[nIndex]
   return `${n}${s}`
 }
+mod.idsToBitmap = function(id){
+  let arr = new Array(52)
+  arr.fill(0)
+  if(typeof id === "object"){
+    id.map(_id=>{
+      arr[arr.length-_id] = 1
+    })
+  } else {
+    arr[arr.length-id] = 1
+  }
+  return arr.join("")
+}
+mod.bitmapToIds = function(bitmap){
+  return bitmap.split("").reverse().map((flag,i)=>{
+    if(flag == 1){
+      return i+1
+    }
+  }).filter(Boolean)
+}
+
 
 mod.calc = function(idsA, idsB){
   const blk = 10000

@@ -96,21 +96,24 @@ class GameManager {
 
     
     // turn1
-    let { newHands: newHands1, bitmap: bitmapB1 } = await this.renderDiscard(handsB)    
+    let { newHands: newHands1, bitmap: bitmapB1 } = await this.renderDiscard(handsB, "")    
+    console.log(bitmapB1)
     Card.renderHands(newHands1)
     await sleep(2)
     newHands1 = await this.draw(newHands1)
     Card.renderHands(newHands1)
 
     // turn2
-    let { newHands: newHands2, bitmap: bitmapB2 } = await this.renderDiscard(newHands1)    
+    let { newHands: newHands2, bitmap: bitmapB2 } = await this.renderDiscard(newHands1, bitmapB1)    
+    console.log(bitmapB2)
     Card.renderHands(newHands2)
     await sleep(2)
     newHands2 = await this.draw(newHands2)
     Card.renderHands(newHands2)
 
     // turn3
-    let { newHands: newHands3, bitmap: bitmapB3 } = await this.renderDiscard(newHands2)    
+    let { newHands: newHands3, bitmap: bitmapB3 } = await this.renderDiscard(newHands2, bitmapB3)
+    console.log(bitmapB3)
     Card.renderHands(newHands3)
     await sleep(2)
     newHands3 = await this.draw(newHands3)
@@ -122,11 +125,9 @@ class GameManager {
   async finalize(hands){
     let handsStr = hands.map(id=> Card.idToAsm(id) ).join("")
     let hash = utils.keccak256(handsStr.toString('utf8'))
-    console.log(`hands:${handsStr}  hash:${hash}`)
     await sleep(2)
   }
   async fetchBothHands(){
-    await sleep(2)
     return this.fetchInitialHands()
   }
   async oddsCalculation(handsA, handsB){
@@ -150,7 +151,7 @@ class GameManager {
     return { handsA: handsA, handsB: handsB }
   }
 
-  async renderDiscard(handsB){
+  async renderDiscard(handsB, bitmapBefore){
     if(handsB.length !== 5) throw new Error("Wrong hand length")
     if(handsB.indexOf(0) === -1) handsB.push(0) //pass
     let opts = handsB.map((id,i)=>{
@@ -173,13 +174,19 @@ class GameManager {
       }
     ])
 
-    var bitmapB = []
     var discardedIndices = item.map(i=> parseInt(i.slice(0,1))-1 )
     var newHands = handsB
       .filter((h,i)=> discardedIndices.indexOf(i) === -1 )
       .filter(h=> h !== 0 )
-    var bitmapB = discardedIndices.map(i=> handsB[i] )
-    return { newHands: newHands, bitmap: bitmapB }
+
+    var bitmapArray = discardedIndices
+      .map(i=> handsB[i] )
+      .filter(h=> h !== 0 )
+
+    bitmapArray = bitmapArray.concat(Card.bitmapToIds(bitmapBefore))
+
+
+    return { newHands: newHands, bitmap: Card.idsToBitmap(bitmapArray) }
   }
 
   async draw(hands){

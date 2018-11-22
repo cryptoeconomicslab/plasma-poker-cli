@@ -85,15 +85,17 @@ class GameManager {
     }])
     return { index: opts.indexOf(item), opts: opts }
   }
-  async renderGame(player1,player2){
+  async renderGame(player1, player2){
     let { handsA, handsB } = this.fetchInitialHands()
     
-    console.log(chalk.red(`${player1}`))
-    Card.renderHands(handsA)
     console.log(chalk.blue(`${player2}`))
     Card.renderHands(handsB)
-  
-    Card.calc(handsA, handsB)
+
+    
+    var { newHands, bitmapB } = await this.renderDiscard(handsB)    
+    console.log(newHands, bitmapB)
+
+    // Card.calc(handsA, handsB)
   }
 
   fetchInitialHands(){
@@ -128,6 +130,29 @@ class GameManager {
     return { handsA: handsA, handsB: handsB }
   }
 
+  async renderDiscard(handsB){
+    let opts = handsB.map((id,i)=> `${i+1}: ${Card.idToCard(id)}` )
+    let { item } = await inquirer.prompt([
+      {
+        type: 'checkbox',
+        message: 'Discard?',
+        name: 'item',
+        choices: opts,
+        validate: function(answer) {
+          if (answer.length < 1) {
+            return 'You must choose at least one topping.';
+          }
+          return true;
+        }
+      }
+    ])
+
+    var bitmapB = []
+    var discardedIndices = item.map(i=> parseInt(i.slice(0,1))-1 )
+    var newHands = handsB.filter((h,i)=> discardedIndices.indexOf(i) === -1 )
+    var bitmapB = discardedIndices.map(i=> handsB[i] )
+    return { newHands: newHands, bitmapB: bitmapB }
+  }
 }
 
 

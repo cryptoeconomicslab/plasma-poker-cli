@@ -7,7 +7,7 @@ const {
 const RLP = require('rlp')
 const ChildChainApi = require('../helpers/childchain')
 const { Storage, BigStorage } = require('./storage')
-const utils = require( 'ethereumjs-util')
+const utils = require('ethereumjs-util')
 
 /**
  * Plasma wallet store UTXO and proof

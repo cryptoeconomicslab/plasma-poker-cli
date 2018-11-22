@@ -4,6 +4,7 @@ const inquirer = require('inquirer')
 const Card = require("./../helpers/card")
 const { sleep } = require("./../helpers/animation")
 const _ = require("lodash")
+const utils = require('ethereumjs-util')
 
 const {
   fetchBlockNumber,
@@ -115,9 +116,22 @@ class GameManager {
     newHands3 = await this.draw(newHands3)
     Card.renderHands(newHands3)
 
+    return newHands3
+  }
 
-
-    // Card.calc(handsA, handsB)
+  async finalize(hands){
+    let handsStr = hands.map(id=> Card.idToAsm(id) ).join("")
+    let hash = utils.keccak256(handsStr)
+    console.log(`hands:${handsStr}  hash:${hash}`)
+    await sleep(2)
+  }
+  async fetchBothHands(){
+    await sleep(2)
+    return this.fetchInitialHands()
+  }
+  async oddsCalculation(handsA, handsB){
+    // In real scenario, this must be in the childchain and SDK
+    Card.calc(handsA, handsB)
   }
 
   fetchInitialHands(){
@@ -164,9 +178,13 @@ class GameManager {
   async draw(hands){
     let chanceCount = 5 - hands.length
     let newCards = []
+    // in actual scenario, childchain will make this
     while(chanceCount > 0){
-      newCards.push(Card.randomId())
-      chanceCount--
+      var newCard = Card.randomId()
+      if(hands.indexOf(newCard) === -1){
+        newCards.push(newCard)
+        chanceCount--
+      }
     }
     return hands.concat(newCards)
   }

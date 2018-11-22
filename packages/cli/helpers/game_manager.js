@@ -86,7 +86,8 @@ class GameManager {
       }
     });
     Storage.store(`room-${roomname}`, "")
-    const utxo = this.wallet.getUTXOArray()[0];
+    const utxos = await this.wallet.update()
+    const utxo = utxos[0];
     if(utxo) {
       this.sdk.sendMultisigInfo(roomname, utxo);
     }else{

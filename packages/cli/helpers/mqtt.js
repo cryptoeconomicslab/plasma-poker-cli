@@ -24,7 +24,13 @@ class MQTTClient extends EventEmitter {
   }
 
   publish(topic, message) {
-    this.client.publish(topic, message)
+    this.client.publish(
+      topic,
+      JSON.stringify(message),
+      {
+        retain: true
+      }
+    )
   }
 
 }

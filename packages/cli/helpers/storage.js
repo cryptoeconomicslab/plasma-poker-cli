@@ -1,10 +1,5 @@
 const { promisify } = require("util")
-var { readFile, writeFile, readdir, mkdir, unlink } = require("fs")
-readFile = promisify(readFile)
-writeFile = promisify(writeFile)
-readdir = promisify(readdir)
-mkdir = promisify(mkdir)
-unlink = promisify(unlink)
+const fs = require("fs")
 
 function isJson(text){
   return text.length > 0 ?
@@ -16,10 +11,10 @@ function isJson(text){
 }
 
 const Storage = {
-  store: async function(key, item) {
+  store: function(key, item) {
     var res = false;
     try {
-      await writeFile(`data/${key}`, JSON.stringify(item))
+      fs.writeFileSync(`data/${key}`, JSON.stringify(item))
       res = true
     } catch(e){
       console.error(e)
@@ -28,17 +23,17 @@ const Storage = {
     return res
   },
 
-  load: async function(key) {
+  load: function(key) {
     var res = null;
     try {
-      res = (await readFile(`data/${key}`)).toString()
-      res = isJson(res) ? JSON.parse(res) : res
+      res = (fs.readFileSync(`data/${key}`)).toString()
+      res = isJson(res) ? JSON.parse(res) : null
     } catch(e){
-      let rootFiles = await readdir("./")
+      let rootFiles = fs.readdirSync("./")
       if(rootFiles.includes("package.json") && rootFiles.includes("data")){
-        await writeFile(`data/${key}`, "")
+        fs.writeFileSync(`data/${key}`, "")
       } else if(!rootFiles.includes("data")) {
-        await mkdir("data")
+        fs.mkdirSync("data")
       } else {
         console.error("load failed, not in root")
       }
@@ -46,23 +41,23 @@ const Storage = {
     }
     return res
   },
-  searchRooms: async function(){
+  searchRooms: function(){
     let head = "room-"
-    let files = await readdir("data")
+    let files = fs.readdirSync("data")
     let hits = files.filter(file=>{
       return file.indexOf(head) === 0
     })
     return hits.map(str=> str.replace(head, "") )
   },
-  deleteRoom: async function(key){
-    await unlink(`data/room-${key}`)
+  deleteRoom: function(key){
+    fs.unlinkSync(`data/room-${key}`)
   }
 
 }
 
 
 const BigStorage = {
-  add: async function(utxoKey, blkNum, proof, txBytes){
+  add: function(utxoKey, blkNum, proof, txBytes){
     let data = JSON.stringify({
       id: utxoKey + '.' + blkNum,
       utxoKey: utxoKey,
@@ -70,14 +65,14 @@ const BigStorage = {
       proof: proof,
       txBytes: txBytes
     })
-    return await Storage.store(`proof__${utxoKey}__${blkNum}`, data)
+    return Storage.store(`proof__${utxoKey}__${blkNum}`, data)
   },
-  searchProof: async function(utxoKey){
-    let files = await readdir("data")
+  searchProof: function(utxoKey){
+    let files = fs.readdir("data")
     let utxoKeysWithBlkNum = files.filter(file=>{
       return file.indexOf(`proof__${utxoKey}`) > 0
     })
-    return utxoKeysWithBlkNum.map(async k=> await Storage.load(k) )
+    return utxoKeysWithBlkNum.map(k => Storage.load(k) )
   }
 }
 

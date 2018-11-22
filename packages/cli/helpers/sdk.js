@@ -10,10 +10,10 @@ const MqttClient = require('./mqtt')
 class Integration {
   constructor() {
     this.mqttClient = new MqttClient();
-    this.mqttClient.on('message', (topic, message) => {
-      console.log(topic, message)
+    this.mqttClient.on('message', (message) => {
+      console.log(message)
     })
-    this.mqttClient.subscribe('*')
+    this.mqttClient.subscribe('rooms')
   }
 
   static nHash(p, n) {
@@ -21,15 +21,16 @@ class Integration {
     if(n <= 1) {
       return h
     } else {
-      return nHash(h, n - 1)
+      return Integration.nHash(h, n - 1)
     }
   }
 
-  async sendMultisigInfo(targetName, utxo) {
+  async sendMultisigInfo(roomName, utxo) {
     const preimage = randomBytes(16)
     await Storage.store('preimage', utils.bufferToHex(preimage))
     const hash = Integration.nHash(preimage, 10)
-    this.mqttClient.publish(targetName, {
+    this.mqttClient.publish('rooms', {
+      roomName: roomName,
       utxo: utils.bufferToHex(utxo.getBytes()),
       hash: utils.bufferToHex(hash)
     });

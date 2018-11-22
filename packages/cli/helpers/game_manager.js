@@ -121,7 +121,7 @@ class GameManager {
 
   async finalize(hands){
     let handsStr = hands.map(id=> Card.idToAsm(id) ).join("")
-    let hash = utils.keccak256(handsStr)
+    let hash = utils.keccak256(handsStr.toString('utf8'))
     console.log(`hands:${handsStr}  hash:${hash}`)
     await sleep(2)
   }
@@ -151,7 +151,13 @@ class GameManager {
   }
 
   async renderDiscard(handsB){
-    let opts = handsB.map((id,i)=> `${i+1}: ${Card.idToCard(id)}` )
+    if(handsB.length !== 5) throw new Error("Wrong hand length")
+    if(handsB.indexOf(0) === -1) handsB.push(0) //pass
+    let opts = handsB.map((id,i)=>{
+      var card = (id===0) ? "Pass ✋" : Card.idToCard(id)
+      return `${i+1}: ${card}`
+    })
+
     let { item } = await inquirer.prompt([
       {
         type: 'checkbox',
@@ -171,6 +177,7 @@ class GameManager {
     var discardedIndices = item.map(i=> parseInt(i.slice(0,1))-1 )
     var newHands = handsB
       .filter((h,i)=> discardedIndices.indexOf(i) === -1 )
+      .filter(h=> h !== 0 )
     var bitmapB = discardedIndices.map(i=> handsB[i] )
     return { newHands: newHands, bitmap: bitmapB }
   }

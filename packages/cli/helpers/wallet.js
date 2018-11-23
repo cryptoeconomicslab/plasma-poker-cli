@@ -12,7 +12,7 @@ const BigNumber = require('bignumber.js')
 
 const CHUNK_SIZE = BigNumber('1000000000000000000');
 
-const WALLET_MODE_UNKNOWM = 0;
+const WALLET_MODE_UNKNOWN = 0;
 const WALLET_MODE_METAMASK = 1;
 const WALLET_MODE_MOBILE = 2;
 
@@ -188,7 +188,7 @@ class PlasmaWallet {
       const slot = start.div(CHUNK_SIZE).integerValue(BigNumber.ROUND_FLOOR).toNumber();
       return slot;
     });
-    // TODO: shoud fold history
+    // TODO: should fold history
     const history = BigStorage.get(slots[0], utxo.blkNum);
     console.log(history);
     const tx = Transaction.fromBytes(Buffer.from(history.txBytes, 'hex'));

@@ -22,6 +22,11 @@ class Integration extends EventEmitter {
     this.mqttClient.subscribe('rooms')
   }
 
+  /**
+   * @description generate hash chain and return last hash
+   * @param {Buffer} preimage 
+   * @param {Integer} num 
+   */
   static hashchain(preimage, num) {
     const h = utils.sha3(preimage);
     if(num <= 1) {
@@ -31,6 +36,11 @@ class Integration extends EventEmitter {
     }
   }
 
+  /**
+   * publish infomations needed for making multisig
+   * @param {String} roomName 
+   * @param {TransactionOutput} utxo 
+   */
   async sendMultisigInfo(roomName, utxo) {
     const preimage = randomBytes(16)
     await Storage.store('preimage', utils.bufferToHex(preimage))

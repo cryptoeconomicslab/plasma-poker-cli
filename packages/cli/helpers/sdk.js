@@ -22,19 +22,19 @@ class Integration extends EventEmitter {
     this.mqttClient.subscribe('rooms')
   }
 
-  static nHash(p, n) {
-    const h = utils.sha3(p);
-    if(n <= 1) {
+  static hashchain(preimage, num) {
+    const h = utils.sha3(preimage);
+    if(num <= 1) {
       return h
     } else {
-      return Integration.nHash(h, n - 1)
+      return Integration.hashchain(h, num - 1)
     }
   }
 
   async sendMultisigInfo(roomName, utxo) {
     const preimage = randomBytes(16)
     await Storage.store('preimage', utils.bufferToHex(preimage))
-    const hash = Integration.nHash(preimage, 10)
+    const hash = Integration.hashchain(preimage, 10)
     this.mqttClient.publish('rooms', {
       roomName: roomName,
       utxo: utils.bufferToHex(utxo.getBytes()),

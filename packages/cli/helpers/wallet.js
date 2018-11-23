@@ -31,7 +31,7 @@ class PlasmaWallet {
     // address is hex string and checksum address
     this.address = null;
     this.zeroHash = utils.sha3(0).toString('hex');
-    this.mode = WALLET_MODE_UNKNOWM;
+    this.mode = WALLET_MODE_UNKNOWN;
   }
 
   getAddress() {

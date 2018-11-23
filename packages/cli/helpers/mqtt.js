@@ -13,7 +13,10 @@ class MQTTClient extends EventEmitter {
     
     this.client.on('message', (topic, message) => {
       // message is Buffer
-      this.emit('message', message.toString())
+      this.emit('message', {
+        topic: topic,
+        message: JSON.parse(message.toString())
+      })
     })
 
   }

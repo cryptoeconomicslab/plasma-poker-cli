@@ -24,6 +24,11 @@ class GameManager {
     this.web3Child = web3Child
     this.address = address
     this.sdk = new Integration();
+    this.sdk.on('message', (e) => {
+      if(e.topic == 'rooms') {
+        this.addRoom(e.message)
+      }
+    })
   }
 
   async renderTitle(){
@@ -216,6 +221,10 @@ class GameManager {
 
 
     return { newHands: newHands, bitmap: Card.idsToBitmap(bitmapArray) }
+  }
+
+  addRoom(message) {
+    Storage.store(`room-${message.roomName}`, message)
   }
 
   async draw(hands, bitmap){

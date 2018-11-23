@@ -6,12 +6,18 @@ const {
   TransactionOutput
 } = require('@cryptoeconomicslab/plasma-chamber')
 const MqttClient = require('./mqtt')
+const EventEmitter = require('events')
 
-class Integration {
+class Integration extends EventEmitter {
+
   constructor() {
+    super()
     this.mqttClient = new MqttClient();
-    this.mqttClient.on('message', (message) => {
-      console.log(message)
+    this.mqttClient.on('message', e => {
+      this.emit('message', {
+        topic: e.topic,
+        message: e.message
+      })
     })
     this.mqttClient.subscribe('rooms')
   }

@@ -7,6 +7,7 @@ const { sleep } = require("./../helpers/animation")
 const _ = require("lodash")
 const utils = require('ethereumjs-util')
 const { Storage } = require("./../helpers/storage")
+const Integration = require('./sdk')
 
 const {
   fetchBlockNumber,
@@ -22,6 +23,12 @@ class GameManager {
     this.web3Root = web3Root
     this.web3Child = web3Child
     this.address = address
+    this.sdk = new Integration();
+    this.sdk.on('message', (e) => {
+      if(e.topic == 'rooms') {
+        this.addRoom(e.message)
+      }
+    })
   }
 
   async renderTitle(){
@@ -84,6 +91,13 @@ class GameManager {
       }
     });
     Storage.store(`room-${roomname}`, "")
+    const utxos = await this.wallet.update()
+    const utxo = utxos[0];
+    if(utxo) {
+      this.sdk.sendMultisigInfo(roomname, utxo);
+    }else{
+      // you have no utxo
+    }
   }
   async renderRoomList(){
     let opts = await Storage.searchRooms()
@@ -207,6 +221,10 @@ class GameManager {
 
 
     return { newHands: newHands, bitmap: Card.idsToBitmap(bitmapArray) }
+  }
+
+  addRoom(message) {
+    Storage.store(`room-${message.roomName}`, message)
   }
 
   async draw(hands, bitmap){

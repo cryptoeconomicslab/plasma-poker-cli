@@ -8,7 +8,7 @@ const { sleep } = require("./helpers/animation")
 async function main(){
   sleep(1) // without await, parallel
   let { wallet, web3Root, web3Child, address } = await web3connect()
-  wallet.update()
+  await wallet.update()
 
   const game = new GameManager(wallet, web3Root, web3Child, address)
 

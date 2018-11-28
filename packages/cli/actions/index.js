@@ -1,7 +1,7 @@
 const {
-    Transaction,
-    TransactionOutput
-} = require('@cryptoeconomicslab/plasma-chamber')
+  Transaction,
+  TransactionOutput
+} = require('@cryptoeconomicslab/chamber-core')
 const utils = require('ethereumjs-util')
 
 const ChildChainApi = require('../helpers/childchain.js')

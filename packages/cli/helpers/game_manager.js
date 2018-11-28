@@ -52,7 +52,7 @@ class GameManager {
     let currentBlockHeight = await fetchBlockNumber()
     let network = await wallet.getRootNetwork()
     let rootchainBalance = await wallet.getRootBalance()
-    let utxos = wallet.getUTXOArray()
+    let utxos = wallet.getUTXOs()
     let pokerBalance = utxos.length == 0 ? 0 : utxos.map(utxo=> utxo.value ).reduce((a,b)=> a+b )
   
     console.log(chalk.red(`Current Block Height is: ${currentBlockHeight}`))

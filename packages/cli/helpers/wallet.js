@@ -1,17 +1,20 @@
 const Web3 = require('web3')
 const {
-  BaseWallet,
-  Block,
   Transaction,
   TransactionOutput
 } = require('@cryptoeconomicslab/chamber-core')
-const ChildChainApi = require('../helpers/childchain')
+const {
+  BaseWallet
+} = require('@cryptoeconomicslab/chamber-wallet')
 const { Storage, BigStorage } = require('./storage')
 const utils = require('ethereumjs-util')
 
 const WALLET_MODE_UNKNOWN = 0;
 const WALLET_MODE_METAMASK = 1;
 const WALLET_MODE_MOBILE = 2;
+
+const RootChainArtifacts = require('../assets/RootChain.json')
+
 
 /**
  * Plasma wallet store UTXO and proof
@@ -20,13 +23,11 @@ class PlasmaWallet extends BaseWallet {
   constructor() {
     super({
       storage: Storage,
-      bigStorage: BigStorage
+      bigStorage: BigStorage,
+      rootChainAddress: process.env.ROOTCHAIN_ADDRESS || '0x345ca3e014aaf5dca488057592ee47305d9b3e10'
     });
-    this.childChainApi = new ChildChainApi(process.env.CHILDCHAIN_ENDPOINT || 'http://localhost:3000');
     // what we have
     this.utxos = Storage.load('utxo') || {};
-    this.latestBlockNumber = 0;
-    this.loadedBlockNumber = Storage.load('loadedBlockNumber') || 0;
     // privKey is Buffer
     this.privKey = null;
     // address is hex string and checksum address
@@ -34,11 +35,7 @@ class PlasmaWallet extends BaseWallet {
     this.zeroHash = utils.sha3(0).toString('hex');
     this.mode = WALLET_MODE_UNKNOWN;
   }
-
-  getAddress() {
-    return this.address;
-  }
-
+  
   initWeb3() {
     const privateKeyHex = Storage.load('privateKey') || 'c87509a1c067bbde78beb793e6fa76530b6382a4c0241e5e4a9ec0a0f44dc0d3';
     this.privKey = new Buffer(privateKeyHex, 'hex');
@@ -52,39 +49,20 @@ class PlasmaWallet extends BaseWallet {
     const address = utils.privateToAddress(this.privKey);
     web3Root.eth.defaultAccount = utils.bufferToHex(address);
     web3Root.eth.accounts.wallet.add(utils.bufferToHex(this.privKey));
-    this.web3 = web3Root;
-    this.web3Child = web3;
     this.setAddress(utils.toChecksumAddress(utils.bufferToHex(address)));
+    this.setPrivateKey(this.privKey);
+    this.setWeb3(web3Root);
+    this.setWeb3Child(web3);
+    const rootChainContract = new web3.eth.Contract(
+      RootChainArtifacts.abi,
+      this.rootChainAddress
+    )
+    this.setRootChainContract(rootChainContract);
     return {
       web3Root: web3Root,
       web3Child: web3Root,
       address: address
     };
-  }
-
-  /**
-   * @dev update UTXO and proof.
-   */
-  update() {
-    return this.childChainApi.getBlockNumber().then((blockNumber) => {
-      this.latestBlockNumber = blockNumber;
-      let tasks = [];
-      for(let i = this.loadedBlockNumber + 1;i <= this.latestBlockNumber;i++) {
-        tasks.push(this.childChainApi.getBlockByNumber(i));
-      }
-      return Promise.all(tasks);
-    }).then((responses) => {
-      responses.map(res => {
-        const block = res.result
-        this.updateBlock(Block.fromString(JSON.stringify(block)))
-      });
-      this.updateLoadedBlockNumber(this.latestBlockNumber);
-      return this.getUTXOs();
-    });
-  }
-
-  getHistory(utxoKey) {
-    return BigStorage.searchProof(utxoKey);
   }
 
   /**
@@ -110,11 +88,6 @@ class PlasmaWallet extends BaseWallet {
     }else{
       throw new Error('invalid UTXO');
     }
-  }
-
-  updateLoadedBlockNumber(n) {
-    this.loadedBlockNumber = n;
-    Storage.store('loadedBlockNumber', this.loadedBlockNumber);
   }
 
   /*

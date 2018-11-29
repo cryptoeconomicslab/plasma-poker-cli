@@ -26,3 +26,14 @@
   - [A-D][0-13] is the expression of cards
   - This is exactly same as unicode naming
   - Unicode: https://en.m.wikipedia.org/wiki/Playing_cards_in_Unicode#Playing_cards_deck
+
+### Getting Started
+
+Please, set up and launch Chamber.
+https://github.com/cryptoeconomicslab/plasma-chamber
+
+```
+yarn install
+yarn start
+```
+

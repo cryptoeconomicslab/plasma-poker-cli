@@ -10,7 +10,8 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@cryptoeconomicslab/plasma-chamber": "0.0.10",
+    "@cryptoeconomicslab/chamber-core": "^1.0.7",
+    "@cryptoeconomicslab/chamber-wallet": "^1.0.8",
     "axios": "^0.18.0",
     "bip39": "^2.5.0",
     "chalk": "^2.4.1",

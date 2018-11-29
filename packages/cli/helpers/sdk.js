@@ -4,7 +4,7 @@ const { Storage } = require('./storage')
 const {
   Transaction,
   TransactionOutput
-} = require('@cryptoeconomicslab/plasma-chamber')
+} = require('@cryptoeconomicslab/chamber-core')
 const MqttClient = require('./mqtt')
 const EventEmitter = require('events')
 

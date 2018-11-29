@@ -49,11 +49,10 @@ class GameManager {
   async renderMeta(){
     let { wallet, web3Root, web3Child, address } = this
 
-    let currentBlockHeight = await fetchBlockNumber()
+    let currentBlockHeight = await fetchBlockNumber(wallet)
     let network = await wallet.getRootNetwork()
     let rootchainBalance = await wallet.getRootBalance()
-    let utxos = wallet.getUTXOArray()
-    let pokerBalance = utxos.length == 0 ? 0 : utxos.map(utxo=> utxo.value ).reduce((a,b)=> a+b )
+    let pokerBalance = wallet.getBalance()
   
     console.log(chalk.red(`Current Block Height is: ${currentBlockHeight}`))
     console.log(chalk.green(`You're in: ${network}`))

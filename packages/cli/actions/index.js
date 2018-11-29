@@ -1,13 +1,10 @@
 const {
-    Transaction,
-    TransactionOutput
-} = require('@cryptoeconomicslab/plasma-chamber')
+  Transaction,
+  TransactionOutput
+} = require('@cryptoeconomicslab/chamber-core')
 const utils = require('ethereumjs-util')
 
-const ChildChainApi = require('../helpers/childchain.js')
 const PlasmaWallet = require('../helpers/wallet.js')
-
-const childChainApi = new ChildChainApi(process.env.CHILDCHAIN_ENDPOINT || 'http://localhost:3000');
 
 const BN = utils.BN
 
@@ -19,10 +16,6 @@ const UPDATE_UTXO = 'UPDATE_UTXO';
 const DEPOSITED = 'DEPOSITED';
 const SEND_RAW_TRANSACTION = 'SEND_RAW_TRANSACTION';
 
-const RootChainArtifacts = require('../assets/RootChain.json')
-
-const RootChainAddress = process.env.ROOTCHAIN_ADDRESS || '0x345ca3e014aaf5dca488057592ee47305d9b3e10';
-const OperatorAddress = process.env.OPERATOR_ADDRESS || '0x627306090abab3a6e1400e9345bc60c78a8bef57';
 
 module.exports.web3connect = async function() {
   const wallet = new PlasmaWallet();
@@ -31,26 +24,14 @@ module.exports.web3connect = async function() {
   return res
 }
 
-module.exports.fetchBlockNumber = async function () {
-  return childChainApi.getBlockNumber()
+module.exports.fetchBlockNumber = async function (wallet) {
+  return wallet.getBlockNumber()
 }
 
 module.exports.deposit = function deposit() {
   return (dispatch, getState) => {
-    const web3 = getState().wallet.web3;
-    var rootChainContract = new web3.eth.Contract(
-      RootChainArtifacts.abi,
-      RootChainAddress
-    );
-    web3.eth.getAccounts().then((accounts) => {
-      return rootChainContract.methods.deposit(
-        OperatorAddress
-      ).send({
-        from: accounts[0],
-        gas: 200000,
-        value: new BN("100000000000000000")
-      })
-    }).then(function(error, result) {
+    const wallet = getState().wallet
+    wallet.deposit(1).then(function(error, result) {
       console.log("deposit: ", error, result);
       dispatch({
         type: DEPOSITED,

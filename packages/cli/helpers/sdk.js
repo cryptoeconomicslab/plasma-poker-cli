@@ -52,11 +52,15 @@ class Integration extends EventEmitter {
     });
   }
 
-  async createMultisigPhase1(wallet, utxo1, utxo2, hash1, hash2) {
+  async createMultisigPhase1(wallet, utxo1, utxo2, hash1) {
     // Alice's utxo
     const input1 = utxo1
     // Bob's utxo
     const input2 = utxo2
+    const preimage = randomBytes(16)
+    await Storage.store('preimage', utils.bufferToHex(preimage))
+    const hash2 = Integration.hashchain(preimage, 10)
+    
     const output = new TransactionOutput(
       [input1.owners[0], input2.owners[0]],
       [input1.value[0], input2.value[0]]

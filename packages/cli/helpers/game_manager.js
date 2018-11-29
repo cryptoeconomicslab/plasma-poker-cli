@@ -6,7 +6,10 @@ const Card = require("./../helpers/card")
 const { sleep } = require("./../helpers/animation")
 const _ = require("lodash")
 const utils = require('ethereumjs-util')
-const { Storage } = require("./../helpers/storage")
+const {
+  RoomModel,
+  RoomListModel
+} = require('./room_model')
 const Integration = require('./sdk')
 
 const {
@@ -23,6 +26,7 @@ class GameManager {
     this.web3Root = web3Root
     this.web3Child = web3Child
     this.address = address
+    this.roomList = RoomListModel.load()
     this.sdk = new Integration();
     this.sdk.on('message', (e) => {
       if(e.topic == 'rooms') {
@@ -89,17 +93,19 @@ class GameManager {
         return bool
       }
     });
-    Storage.store(`room-${roomname}`, "")
     const utxos = await this.wallet.update()
     const utxo = utxos[0];
+    console.log('utxos', utxos)
     if(utxo) {
       this.sdk.sendMultisigInfo(roomname, utxo);
+      console.log('success to send', utxo)
     }else{
       // you have no utxo
     }
   }
   async renderRoomList(){
-    let opts = await Storage.searchRooms()
+    let opts = this.roomList.search()
+    console.log(opts)
     if(opts.length === 0) throw new Error("No rooms!")
 
     let { item } = await inquirer.prompt([{
@@ -108,11 +114,22 @@ class GameManager {
       message: 'Room List',
       choices: opts
     }])
+
+    const utxos = await this.wallet.update()
+    const utxo = utxos[0];
+    if(utxo) {
+      this.sdk.createMultisigPhase1(
+        this.wallet,
+        item.utxo,
+        utxo,
+        item.hash)
+    }
     return { index: opts.indexOf(item), opts: opts }
 
   }
   async renderGame(player1){
-    await Storage.deleteRoom(player1)
+    this.roomList.remove(player1)
+    this.roomList.store()
     const { player2 } = await prompts({
       type: 'text',
       name: 'player2',
@@ -223,7 +240,13 @@ class GameManager {
   }
 
   addRoom(message) {
-    Storage.store(`room-${message.roomName}`, message)
+    console.log('addRoom', message)
+    this.roomList.add(new RoomModel(
+      message.roomName,
+      message.utxo,
+      message.hash
+    ))
+    this.roomList.store()
   }
 
   async draw(hands, bitmap){

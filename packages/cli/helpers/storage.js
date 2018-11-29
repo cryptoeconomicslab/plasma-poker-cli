@@ -10,8 +10,8 @@ function isJson(text){
     false
 }
 
-const Storage = {
-  store: function(key, item) {
+class Storage {
+  static store(key, item) {
     var res = false;
     try {
       fs.writeFileSync(`data/${key}`, JSON.stringify(item))
@@ -21,9 +21,9 @@ const Storage = {
       res = false
     }
     return res
-  },
+  }
 
-  load: function(key) {
+  static load(key) {
     var res = null;
     try {
       res = (fs.readFileSync(`data/${key}`)).toString()
@@ -40,19 +40,7 @@ const Storage = {
       console.error(e)
     }
     return res
-  },
-  searchRooms: function(){
-    let head = "room-"
-    let files = fs.readdirSync("data")
-    let hits = files.filter(file=>{
-      return file.indexOf(head) === 0
-    })
-    return hits.map(str=> str.replace(head, "") )
-  },
-  deleteRoom: function(key){
-    fs.unlinkSync(`data/room-${key}`)
   }
-
 }
 
 

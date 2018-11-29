@@ -29,7 +29,7 @@
 
 ### Getting Started
 
-Please setup and launch Chamber.
+Please, set up and launch Chamber.
 https://github.com/cryptoeconomicslab/plasma-chamber
 
 ```
